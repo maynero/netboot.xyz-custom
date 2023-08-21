@@ -41,7 +41,10 @@ goto main_menu
 
 :local
 echo Booting from local disks ...
-exit 1
+sanboot --no-describe --drive 0x80 ||
+sanboot --no-describe --drive 0x81 ||
+sanboot --no-describe --drive 0x82 ||
+exit 0
 
 :shell
 echo Type "exit" to return to menu.
