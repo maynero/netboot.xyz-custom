@@ -1,12 +1,50 @@
 #!ipxe
-###
-### netboot.xyz-custom menu
-###
 
 :start
-echo Hello world!
-sleep 10
-goto custom_exit
+isset ${arch} && goto skip_arch_detect ||
+cpuid --ext 29 && set arch x86_64 || set arch i386
+iseq ${buildarch} arm64 && set arch arm64 ||
+iseq ${cls} serial && goto ignore_cls ||
+set cls:hex 1b:5b:4a  # ANSI clear screen sequence - "^[[J"
+set cls ${cls:string}
+:ignore_cls
 
-:custom_exit
+:main_menu
+clear menu
+set space:hex 20:20
+set space ${space:string}
+menu RCM PXE Boot
+item --gap Default:
+item local ${space} Boot from local hdd
+item --gap Local:
+item wds ${space} WDS
+item --gap Online:
+item netboot ${space} Netboot.xyz
+item --gap Tools:
+item shell ${space} iPXE shell
+choose --timeout 300000 --default ${menu} menu || goto local
+echo ${cls}
+goto ${menu}
+
+:local
+echo Booting from local disks ...
 exit 0
+
+:wds
+echo Booting from WDS...
+set netX/next-server 192.168.2.14
+iseq ${platform} efi && set wds_uri tftp://${netX/next-server}/boot/x64/wdsmgfw.efi || set wds_uri tftp://${netX/next-server}/boot/x86/wdsnbp.com
+echo WDS URI - ${wds_uri}
+chain ${wds_uri}
+goto main_menu
+
+:netboot
+echo Booting from Netboot...
+chain --autofree https://boot.netboot.xyz
+goto main_menu
+
+:shell
+echo Type "exit" to return to menu.
+set menu main_menu
+shell
+goto main_menu
