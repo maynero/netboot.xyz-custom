@@ -22,7 +22,7 @@ item --gap Online:
 item netboot ${space} Netboot.xyz
 item --gap Tools:
 item shell ${space} iPXE shell
-choose --timeout 300000 --default ${menu} menu || goto local
+choose --timeout 20000 --default ${menu} menu || goto local
 echo ${cls}
 goto ${menu}
 
