@@ -26,10 +26,6 @@ choose --timeout 300000 --default ${menu} menu || goto local
 echo ${cls}
 goto ${menu}
 
-:local
-echo Booting from local disks ...
-exit 0
-
 :wds
 echo Booting from WDS...
 set netX/next-server 192.168.2.14
@@ -42,6 +38,10 @@ goto main_menu
 echo Booting from Netboot...
 chain --autofree https://boot.netboot.xyz
 goto main_menu
+
+:local
+echo Booting from local disks ...
+exit 0
 
 :shell
 echo Type "exit" to return to menu.
